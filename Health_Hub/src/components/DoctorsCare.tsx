@@ -1,184 +1,122 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import SectionTitle from './SectionTitle';
 import AnimatedButton from './AnimatedButton';
-import { cn } from '@/lib/utils';
 
 const doctors = [
   {
     id: 1,
     name: 'Dr. Sarah Johnson',
     specialty: 'Cardiology',
+    experience: '15+ years',
+    qualifications: 'MD, FACC',
     image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=1470&auto=format&fit=crop',
-    experience: '15+ years experience',
-    description: 'Specializing in interventional cardiology with expertise in complex cardiac procedures.'
+    description: 'Specialized in interventional cardiology and heart disease prevention. Expert in minimally invasive cardiac procedures.'
   },
   {
     id: 2,
     name: 'Dr. Michael Chen',
     specialty: 'Neurology',
+    experience: '12+ years',
+    qualifications: 'MD, PhD',
     image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=1470&auto=format&fit=crop',
-    experience: '12+ years experience',
-    description: 'Expert in neurological disorders with advanced training in stroke management and neuro-interventions.'
+    description: 'Leading expert in neurological disorders, stroke treatment, and brain surgery with extensive research background.'
   },
   {
     id: 3,
     name: 'Dr. Emily Rodriguez',
     specialty: 'Pediatrics',
-    image: 'https://images.unsplash.com/photo-1527613426441-4da17471b66d?q=80&w=1470&auto=format&fit=crop',
-    experience: '10+ years experience',
-    description: 'Dedicated to providing comprehensive care for children with a focus on developmental pediatrics.'
+    experience: '10+ years',
+    qualifications: 'MD, FAAP',
+    image: 'https://images.unsplash.com/photo-1594824846898-ceeeed99bae8?q=80&w=1470&auto=format&fit=crop',
+    description: 'Dedicated pediatrician focusing on child development, immunizations, and adolescent medicine.'
+  },
+  {
+    id: 4,
+    name: 'Dr. Robert Wilson',
+    specialty: 'Orthopedics',
+    experience: '18+ years',
+    qualifications: 'MD, FAAOS',
+    image: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?q=80&w=1470&auto=format&fit=crop',
+    description: 'Orthopedic surgeon specializing in joint replacement, sports medicine, and minimally invasive procedures.'
+  },
+  {
+    id: 5,
+    name: 'Dr. Amanda Thompson',
+    specialty: 'Oncology',
+    experience: '14+ years',
+    qualifications: 'MD, FASCO',
+    image: 'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?q=80&w=1470&auto=format&fit=crop',
+    description: 'Medical oncologist with expertise in cancer treatment, chemotherapy, and personalized cancer care.'
+  },
+  {
+    id: 6,
+    name: 'Dr. James Park',
+    specialty: 'Internal Medicine',
+    experience: '16+ years',
+    qualifications: 'MD, FACP',
+    image: 'https://images.unsplash.com/photo-1551190822-a9333d879b1f?q=80&w=1470&auto=format&fit=crop',
+    description: 'Internal medicine physician focusing on preventive care, chronic disease management, and wellness programs.'
   }
 ];
 
 const DoctorsCare = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [imagesLoaded, setImagesLoaded] = useState<Record<number, boolean>>({});
-
-  useEffect(() => {
-    const loadImages = async () => {
-      const promises = doctors.map((doctor) => {
-        return new Promise<number>((resolve) => {
-          const img = new Image();
-          img.src = doctor.image;
-          img.onload = () => resolve(doctor.id);
-        });
-      });
-
-      const loadedIds = await Promise.all(promises);
-      const loadedState = loadedIds.reduce((acc, id) => {
-        acc[id] = true;
-        return acc;
-      }, {} as Record<number, boolean>);
-      
-      setImagesLoaded(loadedState);
-    };
-
-    loadImages();
-  }, []);
-
-  const handleNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % doctors.length);
-  };
-
-  const handlePrev = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + doctors.length) % doctors.length);
-  };
-
   return (
-    <section id="doctors" className="py-20 bg-gray-50 relative">
-      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_bottom,#f9fbff,transparent)]"></div>
+    <section id="doctors" className="py-20 bg-gradient-to-b from-white to-gray-50 relative">
+      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_bottom_left,#f0f7ff,transparent)]"></div>
       <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <SectionTitle 
           title="Our Expert Doctors" 
-          subtitle="Our team of highly skilled and experienced medical professionals is dedicated to providing personalized care and treatment."
-          highlightColor="bg-health-orange/10"
+          subtitle="Meet our highly qualified medical professionals dedicated to providing exceptional healthcare with compassion and expertise."
         />
         
-        <div className="mt-12">
-          <div className="carousel-container overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
+          {doctors.map((doctor, index) => (
             <div 
-              className="carousel-track flex transition-transform duration-500" 
-              style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+              key={doctor.id}
+              className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 animate-fade-in opacity-0"
+              style={{animationDelay: `${300 + (index * 150)}ms`}}
             >
-              {doctors.map((doctor, index) => (
-                <div key={doctor.id} className="carousel-item w-full flex-shrink-0 px-4">
-                  <div className="bg-white rounded-2xl shadow-elevation overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div className="relative h-64 md:h-auto">
-                        {!imagesLoaded[doctor.id] && (
-                          <div className="absolute inset-0 bg-gray-200 animate-pulse"></div>
-                        )}
-                        <img 
-                          src={doctor.image} 
-                          alt={doctor.name} 
-                          className={cn(
-                            "h-full w-full object-cover transition-opacity duration-500",
-                            imagesLoaded[doctor.id] ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                      </div>
-                      <div className="p-6 flex flex-col justify-center">
-                        <div className="inline-block px-3 py-1 mb-3 text-xs font-medium text-health-blue bg-health-blue/10 rounded-full">
-                          {doctor.specialty}
-                        </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">{doctor.name}</h3>
-                        <p className="text-sm text-health-blue font-medium mb-4">{doctor.experience}</p>
-                        <p className="text-gray-600 mb-6">{doctor.description}</p>
-                        <div className="mt-auto">
-                          <Link to="/book-appointment">
-                            <AnimatedButton variant="secondary" size="sm">
-                              Book Appointment
-                            </AnimatedButton>
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+              <div className="relative h-64 overflow-hidden">
+                <img 
+                  src={doctor.image} 
+                  alt={doctor.name}
+                  className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                <div className="absolute bottom-4 left-4 text-white">
+                  <p className="text-sm font-medium">{doctor.qualifications}</p>
+                  <p className="text-xs opacity-90">{doctor.experience}</p>
                 </div>
-              ))}
+              </div>
+              
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{doctor.name}</h3>
+                <p className="text-health-blue font-semibold mb-3">{doctor.specialty}</p>
+                <p className="text-gray-600 text-sm mb-4 leading-relaxed">{doctor.description}</p>
+                
+                <div className="flex gap-2">
+                  <AnimatedButton variant="primary" size="sm" className="flex-1 text-xs">
+                    View Profile
+                  </AnimatedButton>
+                  <Link to="/book-appointment" className="flex-1">
+                    <AnimatedButton variant="secondary" size="sm" className="w-full text-xs">
+                      Book Appointment
+                    </AnimatedButton>
+                  </Link>
+                </div>
+              </div>
             </div>
-          </div>
-          
-          <div className="mt-8 flex justify-center gap-4">
-            <button 
-              onClick={handlePrev} 
-              className="carousel-button"
-              aria-label="Previous doctor"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="m15 18-6-6 6-6"/>
-              </svg>
-            </button>
-            <button 
-              onClick={handleNext} 
-              className="carousel-button"
-              aria-label="Next doctor"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="m9 18 6-6-6-6"/>
-              </svg>
-            </button>
-          </div>
+          ))}
         </div>
         
-        <div className="mt-16 bg-white p-8 rounded-2xl shadow-elevation">
-          <div className="grid md:grid-cols-2 gap-10">
-            <div className="animate-fade-in opacity-0" style={{animationDelay: '200ms'}}>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Personalized Patient Care</h3>
-              <p className="text-gray-600 mb-6">
-                We believe in a patient-centered approach to healthcare, providing individualized treatment plans and personalized care for every patient. Our team works closely with you to understand your unique health needs and goals.
-              </p>
-              <ul className="space-y-3">
-                {['Individualized treatment plans', 'Comprehensive health assessments', 'Regular follow-up care', 'Patient education and support'].map((item, i) => (
-                  <li key={i} className="flex items-start">
-                    <svg className="w-5 h-5 text-health-blue mt-1 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            
-            <div className="animate-fade-in opacity-0" style={{animationDelay: '400ms'}}>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Advanced Medical Technology</h3>
-              <p className="text-gray-600 mb-6">
-                Our hospital is equipped with state-of-the-art medical technology and facilities to ensure accurate diagnoses and effective treatments. We continually invest in the latest medical innovations to provide the highest standard of care.
-              </p>
-              <ul className="space-y-3">
-                {['Cutting-edge diagnostic equipment', 'Minimally invasive surgical techniques', 'Digital health records for seamless care', 'Telemedicine options for remote consultations'].map((item, i) => (
-                  <li key={i} className="flex items-start">
-                    <svg className="w-5 h-5 text-health-blue mt-1 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+        <div className="text-center mt-12 animate-fade-in opacity-0" style={{animationDelay: '1200ms'}}>
+          <Link to="/book-appointment">
+            <AnimatedButton variant="cta" size="lg">
+              Book an Appointment with Our Doctors
+            </AnimatedButton>
+          </Link>
         </div>
       </div>
     </section>

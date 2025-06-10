@@ -3,11 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import AnimatedButton from './AnimatedButton';
+import { MapPin, Loader2 } from 'lucide-react';
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userLocation, setUserLocation] = useState<string>('');
+  const [locationLoading, setLocationLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,11 +25,58 @@ const Header = () => {
     const loginStatus = localStorage.getItem('isLoggedIn');
     setIsLoggedIn(loginStatus === 'true');
 
+    // Get initial location from localStorage or set default
+    const savedLocation = localStorage.getItem('userLocation');
+    setUserLocation(savedLocation || 'Find Location');
+
     window.addEventListener('scroll', handleScroll);
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, [scrolled]);
+
+  const getUserLocation = async () => {
+    setLocationLoading(true);
+    
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          
+          try {
+            // Use a reverse geocoding service to get location name
+            const response = await fetch(
+              `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+            );
+            const data = await response.json();
+            
+            const locationName = data.city || data.locality || data.principalSubdivision || 'Near You';
+            setUserLocation(locationName);
+            localStorage.setItem('userLocation', locationName);
+          } catch (error) {
+            console.error('Error getting location name:', error);
+            setUserLocation('Location Found');
+            localStorage.setItem('userLocation', 'Location Found');
+          }
+          
+          setLocationLoading(false);
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+          setUserLocation('Location Unavailable');
+          setLocationLoading(false);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 300000 // 5 minutes
+        }
+      );
+    } else {
+      setUserLocation('Location Not Supported');
+      setLocationLoading(false);
+    }
+  };
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -35,6 +85,7 @@ const Header = () => {
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('userEmail');
+    localStorage.removeItem('userData');
     setIsLoggedIn(false);
     navigate('/');
   };
@@ -44,55 +95,77 @@ const Header = () => {
       <div 
         className={cn(
           "fixed top-0 left-0 right-0 transition-all duration-300 ease-in-out backdrop-blur-md",
-          scrolled ? "bg-white/90 shadow-sm py-3" : "bg-transparent py-5"
+          scrolled ? "bg-white/90 shadow-sm py-2" : "bg-transparent py-4"
         )}
       >
         <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
             {/* Logo */}
             <div className="flex-shrink-0 flex items-center">
-              <Link to="/" className="flex items-center">
+              <Link to="/" className="flex items-center mr-8">
                 <span className="text-2xl font-bold text-health-blue mr-1">Health</span>
                 <span className="text-2xl font-bold text-health-orange">Hub</span>
               </Link>
             </div>
 
+            {/* Location Button */}
+            <div className="hidden md:flex items-center">
+              <button
+                onClick={getUserLocation}
+                disabled={locationLoading}
+                className="flex items-center text-sm text-gray-600 hover:text-health-blue transition-colors duration-200 mr-4 px-3 py-2 rounded-lg hover:bg-health-blue/5"
+              >
+                {locationLoading ? (
+                  <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                ) : (
+                  <MapPin className="w-4 h-4 mr-1" />
+                )}
+                <span>{locationLoading ? 'Finding...' : userLocation}</span>
+              </button>
+            </div>
+
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-8">
+            <nav className="hidden md:flex space-x-6">
               <Link 
                 to="/"
-                className="text-gray-700 hover:text-health-blue px-1 py-2 text-sm font-medium transition-colors duration-200 ease-in-out link-hover"
+                className="text-gray-700 hover:text-health-blue px-3 py-2 text-sm font-medium transition-colors duration-200 ease-in-out link-hover"
               >
                 Home
               </Link>
               <a 
                 href="#services"
-                className="text-gray-700 hover:text-health-blue px-1 py-2 text-sm font-medium transition-colors duration-200 ease-in-out link-hover"
+                className="text-gray-700 hover:text-health-blue px-3 py-2 text-sm font-medium transition-colors duration-200 ease-in-out link-hover"
               >
                 Services
               </a>
+              <Link 
+                to="/centers-of-excellence"
+                className="text-gray-700 hover:text-health-blue px-3 py-2 text-sm font-medium transition-colors duration-200 ease-in-out link-hover"
+              >
+                Centers of Excellence
+              </Link>
               <a 
                 href="#doctors"
-                className="text-gray-700 hover:text-health-blue px-1 py-2 text-sm font-medium transition-colors duration-200 ease-in-out link-hover"
+                className="text-gray-700 hover:text-health-blue px-3 py-2 text-sm font-medium transition-colors duration-200 ease-in-out link-hover"
               >
                 Doctors
               </a>
               <a 
                 href="#about"
-                className="text-gray-700 hover:text-health-blue px-1 py-2 text-sm font-medium transition-colors duration-200 ease-in-out link-hover"
+                className="text-gray-700 hover:text-health-blue px-3 py-2 text-sm font-medium transition-colors duration-200 ease-in-out link-hover"
               >
                 About
               </a>
               <a 
                 href="#contact"
-                className="text-gray-700 hover:text-health-blue px-1 py-2 text-sm font-medium transition-colors duration-200 ease-in-out link-hover"
+                className="text-gray-700 hover:text-health-blue px-3 py-2 text-sm font-medium transition-colors duration-200 ease-in-out link-hover"
               >
                 Contact
               </a>
             </nav>
 
             {/* Call to Action */}
-            <div className="hidden md:flex items-center space-x-4">
+            <div className="hidden md:flex items-center space-x-3">
               {isLoggedIn ? (
                 <>
                   <Link to="/book-appointment">
@@ -119,6 +192,14 @@ const Header = () => {
                       size="sm"
                     >
                       Find a Doctor
+                    </AnimatedButton>
+                  </Link>
+                  <Link to="/signup">
+                    <AnimatedButton 
+                      variant="secondary" 
+                      size="sm"
+                    >
+                      Sign Up
                     </AnimatedButton>
                   </Link>
                   <Link to="/login">
@@ -162,6 +243,20 @@ const Header = () => {
         style={{ top: '60px' }}
       >
         <div className="px-4 pt-4 pb-6 space-y-1">
+          {/* Location for mobile */}
+          <button
+            onClick={getUserLocation}
+            disabled={locationLoading}
+            className="flex items-center text-sm text-gray-600 px-3 py-2 w-full text-left hover:bg-gray-50 rounded-md"
+          >
+            {locationLoading ? (
+              <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+            ) : (
+              <MapPin className="w-4 h-4 mr-1" />
+            )}
+            <span>{locationLoading ? 'Finding...' : userLocation}</span>
+          </button>
+          
           <Link
             to="/"
             className="block px-3 py-4 text-base font-medium text-gray-700 hover:text-health-blue hover:bg-gray-50 rounded-md"
@@ -176,6 +271,13 @@ const Header = () => {
           >
             Services
           </a>
+          <Link
+            to="/centers-of-excellence"
+            className="block px-3 py-4 text-base font-medium text-gray-700 hover:text-health-blue hover:bg-gray-50 rounded-md"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Centers of Excellence
+          </Link>
           <a
             href="#doctors"
             className="block px-3 py-4 text-base font-medium text-gray-700 hover:text-health-blue hover:bg-gray-50 rounded-md"
@@ -221,6 +323,11 @@ const Header = () => {
                 <Link to="/book-appointment" onClick={() => setMobileMenuOpen(false)}>
                   <AnimatedButton variant="secondary" className="w-full justify-center">
                     Find a Doctor
+                  </AnimatedButton>
+                </Link>
+                <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>
+                  <AnimatedButton variant="secondary" className="w-full justify-center">
+                    Sign Up
                   </AnimatedButton>
                 </Link>
                 <Link to="/login" onClick={() => setMobileMenuOpen(false)}>

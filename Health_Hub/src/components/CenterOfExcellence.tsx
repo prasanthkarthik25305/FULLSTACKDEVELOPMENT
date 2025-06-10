@@ -1,18 +1,51 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import SectionTitle from './SectionTitle';
 import AnimatedButton from './AnimatedButton';
 import { cn } from '@/lib/utils';
+import { Heart, Brain, Bone, Baby, Shield, Stethoscope, Activity, Users, Calendar } from 'lucide-react';
 
 const specialties = [
-  { id: 1, name: 'Cardiac Sciences' },
-  { id: 2, name: 'Neuro Sciences' },
-  { id: 3, name: 'Orthopedic' },
-  { id: 4, name: 'Pediatrics' },
-  { id: 5, name: 'Gynecology' },
-  { id: 6, name: 'Surgical Services' },
-  { id: 7, name: 'Gastroenterology' }, 
-  { id: 8, name: 'Pulmonology' },
-  { id: 9, name: 'Urology' }
+  { id: 1, name: 'Cardiac Sciences', icon: Heart, slug: 'cardiology' },
+  { id: 2, name: 'Neuro Sciences', icon: Brain, slug: 'neurology' },
+  { id: 3, name: 'Orthopedic', icon: Bone, slug: 'orthopedics' },
+  { id: 4, name: 'Pediatrics', icon: Baby, slug: 'pediatrics' },
+  { id: 5, name: 'Gynecology', icon: Users, slug: 'gynecology' },
+  { id: 6, name: 'Surgical Services', icon: Activity, slug: 'surgical-services' },
+  { id: 7, name: 'Gastroenterology', icon: Stethoscope, slug: 'gastroenterology' }, 
+  { id: 8, name: 'Pulmonology', icon: Activity, slug: 'pulmonology' },
+  { id: 9, name: 'Urology', icon: Calendar, slug: 'urology' }
+];
+
+const services = [
+  {
+    id: 1,
+    title: "Emergency Care",
+    description: "24/7 emergency medical services with rapid response teams and state-of-the-art trauma facilities for immediate medical attention.",
+    icon: Activity,
+    features: ["24/7 Availability", "Rapid Response", "Advanced Life Support", "Trauma Care"]
+  },
+  {
+    id: 2,
+    title: "Diagnostic Services",
+    description: "Comprehensive diagnostic imaging and laboratory services including MRI, CT scans, X-rays, and advanced blood testing facilities.",
+    icon: Stethoscope,
+    features: ["MRI & CT Scans", "Digital X-Ray", "Laboratory Tests", "Cardiac Testing"]
+  },
+  {
+    id: 3,
+    title: "Surgical Procedures",
+    description: "Advanced surgical services with minimally invasive techniques, robotic surgery, and comprehensive pre and post-operative care.",
+    icon: Users,
+    features: ["Minimally Invasive", "Robotic Surgery", "Day Surgery", "Specialist Teams"]
+  },
+  {
+    id: 4,
+    title: "Wellness Programs",
+    description: "Preventive healthcare programs focusing on health maintenance, disease prevention, and lifestyle modification for optimal wellness.",
+    icon: Heart,
+    features: ["Health Screenings", "Vaccination", "Nutrition Counseling", "Fitness Programs"]
+  }
 ];
 
 const CenterOfExcellence = () => {
@@ -69,21 +102,73 @@ const CenterOfExcellence = () => {
                   className="animate-fade-in opacity-0"
                   style={{ animationDelay: `${200 + (index * 100)}ms` }}
                 >
-                  <AnimatedButton 
-                    variant="specialty"
-                    className="w-full h-full min-h-[80px] specialty-button-grid-item"
-                  >
-                    {specialty.name}
-                  </AnimatedButton>
+                  <Link to={`/specialty/${specialty.slug}`} className="block">
+                    <AnimatedButton 
+                      variant="specialty"
+                      className="w-full h-full min-h-[80px] specialty-button-grid-item flex flex-col items-center justify-center gap-2 text-center hover:scale-105 transition-transform duration-200"
+                    >
+                      <specialty.icon className="w-5 h-5" />
+                      <span className="text-xs">{specialty.name}</span>
+                    </AnimatedButton>
+                  </Link>
                 </div>
               ))}
             </div>
             
             <div className="mt-8 flex justify-center animate-fade-in opacity-0" style={{animationDelay: '1100ms'}}>
-              <AnimatedButton variant="cta" size="lg">
-                View All Specialties
-              </AnimatedButton>
+              <Link to="/centers-of-excellence">
+                <AnimatedButton variant="cta" size="lg">
+                  View All Specialties
+                </AnimatedButton>
+              </Link>
             </div>
+          </div>
+        </div>
+
+        {/* Our Services Section */}
+        <div className="mt-20">
+          <SectionTitle 
+            title="Our Services" 
+            subtitle="Comprehensive healthcare services designed to meet all your medical needs with excellence and compassion."
+          />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
+            {services.map((service, index) => (
+              <div 
+                key={service.id}
+                className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 animate-fade-in opacity-0"
+                style={{animationDelay: `${300 + (index * 150)}ms`}}
+              >
+                <div className="w-12 h-12 bg-health-blue/10 rounded-lg flex items-center justify-center mb-4">
+                  <service.icon className="w-6 h-6 text-health-blue" />
+                </div>
+                
+                <h3 className="text-lg font-bold text-gray-900 mb-3">{service.title}</h3>
+                <p className="text-gray-600 text-sm mb-4 leading-relaxed">{service.description}</p>
+                
+                <div className="mb-4">
+                  <ul className="space-y-1">
+                    {service.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-center text-xs text-gray-500">
+                        <div className="w-1 h-1 bg-health-blue rounded-full mr-2"></div>
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                
+                <div className="flex gap-2">
+                  <AnimatedButton variant="primary" size="sm" className="flex-1 text-xs">
+                    Learn More
+                  </AnimatedButton>
+                  <Link to="/book-appointment" className="flex-1">
+                    <AnimatedButton variant="secondary" size="sm" className="w-full text-xs">
+                      Book Now
+                    </AnimatedButton>
+                  </Link>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

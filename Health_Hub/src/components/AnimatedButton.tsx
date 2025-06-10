@@ -8,6 +8,7 @@ interface AnimatedButtonProps extends React.ButtonHTMLAttributes<HTMLButtonEleme
   className?: string;
   children: React.ReactNode;
 }
+
 const AnimatedButton = ({
   variant = 'primary',
   size = 'md',
