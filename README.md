@@ -1,4 +1,4 @@
-# Personal Portfolio – A Complete Breakdown
+                                                                                                                                                                                                                                                                                                                                                                                                              y# Personal Portfolio – A Complete Breakdown
 
 This is a **modern personal portfolio project** built with a clean UI, modular code structure, and powerful customization capabilities. It’s designed to be easy to extend, deploy, and update with personal content like certificates, artwork, and project highlights.
 
